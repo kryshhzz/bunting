@@ -1,0 +1,167 @@
+{{ define "base" }}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Bunting</title>
+
+    <style>
+        :root {
+            --b-red : #ed1b24;
+            --b-red-dark : #c32830;
+            
+            --black : #000;
+            --white : #fff;
+
+            --b-gray : #47504f;
+            
+            --light-1 : #eee;
+            --light-2 : #ddd;
+            --light-3 : #ccc;
+            --light-4 : #bbb;
+            --light-5 : #aaa;
+
+            --dark-1 : #111;
+            --dark-2 : #222;
+            --dark-3 : #333;
+            --dark-4 : #444;
+            --dark-5 : #555;
+
+            --wt-35 : rgba(255 255 255 / .35);
+            --wt-60 : rgba(255 255 255 / .60);
+            --wt-80 : rgba(255 255 255 / .80);
+
+        }
+        * {
+            box-sizing : border-box;
+            margin : 0;
+            padding : 0;
+        }
+        body {
+            font-size : 16px;
+            font-family :'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background : var(--black); 
+            color : var(--white);
+        }
+        header {
+            width:100%;
+            padding : 1em;
+            border-bottom : .1em solid var(--dark-3);
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .logo {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap : .5em;
+        }
+        .logo img {
+            width : 4em;
+        }
+        .logo p {
+            text-transform: uppercase;
+            letter-spacing: .1em;
+            font-weight: bold;
+            font-size : .7em;
+            color : var(--light-5);
+        }
+
+        .starter {
+            position : fixed;
+            top : 0;
+            bottom : 0;
+            left : 0;
+            right : 0;
+            background : transparent;
+            backdrop-filter: blur(1em);
+            padding : 1.5em;
+
+            z-index : 10;
+
+            display : flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .inner-starter {
+            width : 100%;
+            max-width : 400px;
+            border-radius : 1em;
+            background : var(--dark-3); 
+            padding : 2em;
+
+            display : flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap : 1em;
+        }
+        .inner-starter button {
+             background: var(--b-red);
+             color : var(--white);
+             border : none;
+             outline : none;
+             padding : 1em 1.5em ;
+             border-radius: 50em; 
+
+             text-transform: uppercase;
+             letter-spacing: .1em;
+             font-weight: bold;
+             font-size : .8em;
+        }
+
+        .hide {
+            display : none !important;
+        }
+
+        main {
+            padding : 1em;
+        }
+
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <img src="/static/bunting.png" alt="">
+            <p class="logo-text">Loading ...</p>
+        </div>
+    </header>
+    <main class="hide">
+        {{ block "content" . }}{{ end }}
+    </main>  
+
+
+    <div class="starter hide">
+        <div class="inner-starter">
+            <p>lets start</p>
+            <button onclick="toggleStarter()">go</button>
+        </div>
+    </div>
+    <script>
+        starter = document.querySelector('.starter')
+
+        function toggleStarter() {
+            starter.classList.toggle('hide')
+        }
+
+        function showContent() {
+            document.querySelector('main').classList.remove('hide')
+            document.querySelector('.logo-text').innerHTML = 'Bunting' 
+            toggleStarter()
+        } 
+
+        function log(txt) {
+            document.querySelector('#log').innerHTML += '<p>' + txt + '</p>';
+        }
+
+    </script>
+    
+</body>
+</html>
+{{ end }}

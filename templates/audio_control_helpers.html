@@ -1,0 +1,33 @@
+{{ define "audio_control_helpers" }}
+
+    <script> 
+
+        class BuntingSong {
+            constructor(title, url, buffer) {
+                this.title = title;
+                this.url = url;
+                this.buffer = buffer;
+            }
+        }
+
+        class library {
+            constructor() {
+                this.songs = {};
+            }
+            add(song) {
+                this.songs[song.url] = song; 
+            }
+        } 
+        LIBRARY = new library(); 
+
+        function getLocalTime() {
+            return Date.now() + (performance.now() % 1);
+        }
+
+        function getPlayedTill(){
+            return PLAY_TIMESTAMP;
+        }
+
+    </script>
+
+{{ end }}

@@ -1,0 +1,130 @@
+{{ define "audio_controls" }}
+    <script>
+        const play_pause_btn = document.querySelector(".play_pause_btn");
+
+        let SERVER_OFFSET = 0;
+        let SENTTIME = 0;
+        let SOCKET = ""; 
+
+        PLAY_TIMESTAMP = 0;
+        AUDIO_PLAYING = false;
+        AUDIO_LOADED = false; 
+        AUDIO_URL = "";
+
+        function ConnectToWebSocket() {
+            SOCKET = new WebSocket("wss://chat-webserver.glitch.me/");
+
+            SOCKET.addEventListener("open", function () {
+                showContent();
+                console.log("✅ Connected to WebSocket server");
+
+                //  sending request for latency 
+                sendMessage('LATENCY');
+                SENTTIME = getLocalTime() ;
+            });
+
+            SOCKET.addEventListener("message", async function (event) {
+                const data = JSON.parse(event.data);
+                console.log(event.data);
+
+                if (data.type === 'PLAY') { 
+                    AUDIO_URL = data.url;
+                    LOCALPLAY(data);
+
+                } else if (data.type === 'PAUSE') {
+                    LOCALPAUSE();
+
+                } else if (data.type === "SERVERTIME") { 
+
+                    // finding latency
+                    const RECEIVEDTIME = Date.now() + (performance.now() % 1);
+                    const SERVER_LATENCY = (RECEIVEDTIME - SENTTIME) / 2;
+                    SERVER_OFFSET = data.serverTime - (SENTTIME + SERVER_LATENCY);
+
+                    console.log("SENTTIME", SENTTIME);
+                    console.log("RECEIVEDTIME", RECEIVEDTIME);
+                    console.log("SERVER_LATENCY", SERVER_LATENCY);
+                    console.log("SERVER_OFFSET", SERVER_OFFSET);
+
+                } else if ( data.type === "LOAD" ){
+                    LoadSongLocal(data.url, data.title);
+
+                } else if ( data.type == "VOLUME" ){
+                    setBuntingVolume(data.volume);
+                }
+            });
+
+            SOCKET.addEventListener("error", function (event) {
+                console.log("❌ WebSocket error:", event);
+            });
+
+            SOCKET.addEventListener("close", function () {
+                console.log("🔌 WebSocket connection closed"); 
+                alert("disconnected, please refresh !")
+                // LOCALPAUSE();
+                // ConnectToWebSocket();
+            });
+        }
+
+        ConnectToWebSocket();
+
+        function sendMessage(payload) {
+            const payload_s = JSON.stringify(payload);
+            SOCKET.send(payload_s);
+            console.log(`📤 You: ${payload_s}`);
+        }
+
+        play_pause_btn.addEventListener('click', () => {
+            toggleGlobalPlayPause();
+        });
+
+        function LOADSONGGLOBAL(to_be_loaded_title, to_be_loaded_url){
+            sendMessage({
+                    type : "LOAD",
+                    url : to_be_loaded_url,
+                    title : to_be_loaded_title,
+            }); 
+        }
+
+        function LOCALPLAY(data) {
+            document.querySelector('.inner_svg').classList.remove('play_svg');
+            BuntingPlay(data);
+        }
+
+        function LOCALPAUSE() {
+            document.querySelector('.inner_svg').classList.add('play_svg');
+            BuntingPause();
+        }
+
+        function toggleGlobalPlayPause() {
+            if (!AUDIO_LOADED) {
+                alert('load audio')
+                return;
+            }
+
+            if (AUDIO_PLAYING) {
+                sendMessage({
+                    type:'PAUSE',
+                    url : AUDIO_URL,
+                });
+            } else { 
+                sendMessage({
+                    type:'PLAY',
+                    url : AUDIO_URL,
+                    timestamp : getPlayedTill(),
+                });
+            }
+        }
+
+        document.addEventListener('keydown', function (event) {
+            if (event.code === "Space") {
+                event.preventDefault();
+                toggleGlobalPlayPause();
+            }
+        }); 
+
+    </script> 
+
+    {{ template "audio_control_helpers" . }}
+
+{{ end }}

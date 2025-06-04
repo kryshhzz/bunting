@@ -1,0 +1,269 @@
+{{ define "content" }}
+
+    <style> 
+        .audio_form {
+            width : 100%;
+            padding : 1em ;
+        }
+        .audio_form input {
+            background : var(--dark-2);
+            color : var(--wt-80);
+            font-size : .9em;
+            border-radius: .5em;
+            border : none;
+            outline : none;
+            padding : .75em 1em;
+            margin : .25em;
+        }
+        .audio_form button {
+            border : none;
+            outline : none;
+            padding :  .8em 1.15em;
+            margin : .25em;
+            background : transparent;
+            color : var(--b-red);
+            border : .2em solid var(--b-red);
+            font-size : .7em;
+            border-radius: .5em;
+            text-transform: uppercase;
+            letter-spacing: .05em;
+            font-weight: bold;
+        }
+        .play_pause_btn {
+            background: var(--b-red);
+            color : var(--white);
+            border : none;
+            outline : none;
+            padding : 1em 1.5em ;
+            border-radius: 50em; 
+        }
+        .floor {
+            position : fixed;
+            bottom : 0;
+            left:0;
+            right : 0;
+            
+            width : 100%;
+            background : var(--dark-2);
+
+            display : flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap : 1em;
+        }
+        .floor-top {
+            width : 100%;
+            background : var(--dark-3);
+            padding : .5em;
+
+            display : flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .floor-top p {
+            text-transform: uppercase;
+            font-size : .8em;
+            letter-spacing: .1em;
+            color : var(--light-5);
+        }
+        .floor-bottom {
+            padding : 1em;
+
+            display : flex;
+            justify-content: center;
+            align-items: center;
+            gap : 1em;
+        }
+        .inner_svg {
+            background : black;
+            width : 1em;
+            height : 1em;
+            border-radius : .2em;
+            transition : clip-path 0.3s ease, margin-left 0.3s ease;
+            clip-path: none;
+        }
+        .play_svg{
+            clip-path: polygon(94% 51%, 11% 1%, 11% 100%) !important;
+            margin-left : .1em; 
+            width : 1.3em; 
+        } 
+
+        #log {
+            width : 100%;
+            color : var(--dark-5);
+            font-size : .8em;
+        }
+        #log p {
+            color : inherit;
+            font-size : inherit;
+        } 
+        .library-bowl {
+            width : 100%;
+            padding : 2em 1em;
+        }
+        .library-cont {
+            width : 100%; 
+
+            display : grid;
+            grid-template-columns: 1fr;
+            place-items : center start;
+            grid-gap : .1em;
+        }
+        .library-cont .tr {
+            width : 100%; 
+
+            display : grid;
+            grid-template-columns: .5fr 1fr;
+            place-items : center start;
+            grid-gap : .1em;
+        } 
+
+        .library-cont p{
+            font-size : .8em;
+            padding : 1em;
+            border-radius : .2em;
+            color : var(--wt-80);
+            width : 100%;
+            overflow : hidden;
+            text-overflow : ellipsis;
+            white-space : nowrap;
+        }
+        .library-cont .tr:nth-child(odd) p {
+            background : var(--dark-3);
+        }
+        .library-cont .tr:nth-child(even) p {
+            background : var(--dark-2);
+        } 
+
+        .volume-slider-bowl {
+            padding : 1em;
+        }
+        .volume-slider {
+            -webkit-appearance: none;
+            width: 100%;
+            max-width : 12em;
+            height: 3em;
+            background: var(--dark-3);
+            outline: none;
+            -webkit-transition: .2s;
+            transition: opacity .2s;
+            border-radius: 10em;
+            padding : .7em;
+
+            position : relative;
+        }
+
+        .volume-slider::before {
+            content : "volume";
+            position : absolute;
+            bottom : 50%;
+            transform : translateY(50%);
+            left : 15%;
+            z-index : 1;
+            color : var(--wt-35);
+        } 
+
+        .volume-slider:hover {
+            opacity: 1;
+        }
+
+        .volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 2em;
+            height: 2em;
+            background: var(--b-red);
+            cursor: pointer;
+            border-radius: 50em;
+            z-index : 5;
+            position: relative;
+        }
+
+        .volume-slider::-moz-range-thumb {
+            width: 2em;
+            height: 2em;
+            background: var(--b-red);
+            cursor: pointer;
+            border-radius: 50em;
+            position: relative;
+            z-index : 5;
+        }
+    </style> 
+
+
+    <div class="floor"> 
+        <div class="floor-top">
+            <p class="footer-current-play-title">No song loaded</p>
+        </div>
+        <div class="floor-bottom">
+            <input type="range" class="volume-slider" max="100" min="0" value="100">
+            <button class="play_pause_btn"> <div class="inner_svg play_svg"></div> </button>
+        </div>
+    </div>
+
+    <form class="audio_form"> 
+        <input type="text" class='audio_title' required value="New Song">
+        <input type="text" class="audio_url" required value="https://aac.saavncdn.com/151/d47f0f0edf55c1ec4ea5633b1ff1ba49_160.mp4">
+        <button>load</button>
+    </form> 
+
+    <div class="library-bowl">
+        <div class="library-cont"> 
+            <div class="tr" onclick="LOADSONGGLOBAL(this.querySelector('.library-song-title').innerHTML, this.querySelector('.library-song-url').innerHTML)">
+                <p class="library-song-title">Peelings</p>
+                <p class="library-song-url">https://aac.saavncdn.com/366/2eb21d94241ba0d9e970d808a7dc015d_160.mp4</p>
+            </div> 
+            <div class="tr" onclick="LOADSONGGLOBAL(this.querySelector('.library-song-title').innerHTML, this.querySelector('.library-song-url').innerHTML)">
+                <p class="library-song-title">Aayi Nai</p>
+                <p class="library-song-url">https://aac.saavncdn.com/373/9a3ad2173b2e80bc6f9655d1da7c8f27_160.mp4</p>
+            </div> 
+        </div>
+    </div> 
+
+    <div id="log"></div> 
+
+    <script>
+        document.querySelector('.audio_form').addEventListener('submit', function(e){
+            e.preventDefault(); 
+            let url = document.querySelector('.audio_url').value.trim();
+            let title = document.querySelector('.audio_title').value.trim();
+            if (!url) return
+            LOADSONGGLOBAL(title, url);
+        }) 
+
+        document.querySelector('.volume-slider').addEventListener('change', function(){
+            let vol = this.value;
+            sendMessage({
+                type : "VOLUME",
+                volume : vol,
+            });
+        })
+
+        function toggleVolume(){
+            document.querySelector('.volume-slider').classList.toggle('hide');
+        }
+
+        function showSong(song) {
+            document.querySelector('.library-cont').innerHTML += `
+                <div class="tr" onclick="LOADSONGGLOBAL(this.querySelector('.library-song-title').innerHTML, this.querySelector('.library-song-url').innerHTML)">
+                    <p class="library-song-title">${song.title}</p>
+                    <p class="library-song-url">${song.url}</p>
+                </div>
+            `
+        }
+
+        function showInFooter(name){
+            document.querySelector(".footer-current-play-title").innerHTML = name;
+        }
+        
+    </script>
+
+    
+    {{ template "audio_controls" . }}
+    {{ template "audio" . }}
+
+
+{{ end }}
+
+{{ template "base" . }} 

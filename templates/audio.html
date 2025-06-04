@@ -1,0 +1,105 @@
+{{ define "audio" }}
+
+<script> 
+
+    const BuntingContext = new (window.AudioContext || window.webkitAudioContext)();
+    let BuntingGainNode = BuntingContext.createGain();
+
+    BuntingGainNode.connect(BuntingContext.destination);
+
+    let BuntingSource = null;
+
+    let AUDIO_PLAYING = false;
+    let PLAY_TIMESTAMP = 0;       // in buffer seconds (seek point)
+    let PLAY_SCHEDULED_AT = 0;    // in context seconds (when .start() happened) 
+
+    function LoadSongLocal(audio_url, audio_name){  
+        LOCALPAUSE(); 
+        if ( AUDIO_URL === audio_url ) {
+            return;
+        }else {
+            PLAY_TIMESTAMP = 0;
+        }
+
+        if (LIBRARY.songs[audio_url]) {
+            AUDIO_URL = audio_url;
+
+            generateBuntingSource();
+            console.log("Audio loaded from library cache! ", audio_url);
+            log("audio loaded from library cache") 
+            showInFooter(LIBRARY.songs[audio_url].title);
+        }else{
+            loadSongHelper(audio_url).then(buffer => {
+                AUDIO_URL = audio_url;
+                let new_song = new BuntingSong(audio_name, audio_url, buffer)
+                LIBRARY.add(new_song);
+                showSong(new_song);
+                generateBuntingSource();
+                console.log("Audio loaded! ", audio_url);
+                log("audio loaded")
+                AUDIO_LOADED = true;
+                showInFooter(audio_name);
+            });
+        } 
+        
+    }
+
+    function BuntingPlay(data) {
+        if (!LIBRARY.songs[AUDIO_URL]) { 
+            alert("audio not ready")
+            return;
+        }
+
+        generateBuntingSource(); // re-create node
+        const when = BuntingContext.currentTime;
+        PLAY_TIMESTAMP = data.timestamp;
+        BuntingSource.start(when, PLAY_TIMESTAMP);
+        PLAY_SCHEDULED_AT = when;
+
+        AUDIO_PLAYING = true;
+        console.log("▶️ Playing from", PLAY_TIMESTAMP.toFixed(2), "seconds");
+    }
+
+    function BuntingPause() {
+        if (!AUDIO_PLAYING) return;
+
+        try {
+            BuntingSource.stop();
+            AUDIO_PLAYING = false;
+
+            // Update buffer timestamp (how far we’ve played)
+            const playedDuration = BuntingContext.currentTime - PLAY_SCHEDULED_AT;
+            PLAY_TIMESTAMP += playedDuration;
+
+            console.log("⏸️ Paused at", PLAY_TIMESTAMP.toFixed(2), "seconds");
+
+        } catch (e) {
+            console.error("Pause error:", e);
+        }
+    } 
+
+    function loadSongHelper(url) {
+        return fetch(url)
+            .then(res => res.arrayBuffer())
+            .then(arrBuf => BuntingContext.decodeAudioData(arrBuf)); 
+    }
+
+    function generateBuntingSource() {
+        BuntingSource = BuntingContext.createBufferSource();
+        BuntingSource.buffer = LIBRARY.songs[AUDIO_URL].buffer;
+        BuntingSource.connect(BuntingGainNode);
+        BuntingSource.onended = () => {
+            AUDIO_PLAYING = false;
+            console.log("🎵 Playback finished");
+        };
+    }
+
+    function setBuntingVolume(vol) { 
+        vol = vol / 100
+        currentVolume = Math.min(1, Math.max(0, vol)); 
+        BuntingGainNode.gain.setValueAtTime(currentVolume, BuntingContext.currentTime); 
+        document.querySelector('.volume-slider').value = vol * 100;
+    }
+</script>
+
+{{ end }}
