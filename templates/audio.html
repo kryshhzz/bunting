@@ -45,16 +45,19 @@
     }
 
     function BuntingPlay(data) {
-        if (!LIBRARY.songs[AUDIO_URL]) { 
+        if (!LIBRARY.songs[data.url]) { 
             alert("audio not ready")
             return;
         }
 
         generateBuntingSource(); // re-create node
-        const when = BuntingContext.currentTime;
+        let timeuntilplay = ( ( data.scheduledTime - SERVER_OFFSET  ) - getLocalTime() ) / 1000;
+        const when = BuntingContext.currentTime + timeuntilplay;
         PLAY_TIMESTAMP = data.timestamp;
         BuntingSource.start(when, PLAY_TIMESTAMP);
-        PLAY_SCHEDULED_AT = when;
+        PLAY_SCHEDULED_AT = when; 
+
+        log("time to left "+when)
 
         AUDIO_PLAYING = true;
         console.log("▶️ Playing from", PLAY_TIMESTAMP.toFixed(2), "seconds");

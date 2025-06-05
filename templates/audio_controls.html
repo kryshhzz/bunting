@@ -19,7 +19,7 @@
                 console.log("✅ Connected to WebSocket server");
 
                 //  sending request for latency 
-                sendMessage('LATENCY');
+                sendMessage({"type":"LATENCY"});
                 SENTTIME = getLocalTime() ;
             });
 
@@ -27,14 +27,17 @@
                 const data = JSON.parse(event.data);
                 console.log(event.data);
 
-                if (data.type === 'PLAY') { 
-                    AUDIO_URL = data.url;
-                    LOCALPLAY(data);
+                if (data.type === 'PLAY') {  
 
-                } else if (data.type === 'PAUSE') {
+                    log("play at "+data.scheduledTime)
+
+                    AUDIO_URL = data.url;
+                    LOCALPLAY(data); 
+
+                } else if (data.type == 'PAUSE') {
                     LOCALPAUSE();
 
-                } else if (data.type === "SERVERTIME") { 
+                } else if (data.type == "SERVERTIME") { 
 
                     // finding latency
                     const RECEIVEDTIME = Date.now() + (performance.now() % 1);
@@ -45,6 +48,11 @@
                     console.log("RECEIVEDTIME", RECEIVEDTIME);
                     console.log("SERVER_LATENCY", SERVER_LATENCY);
                     console.log("SERVER_OFFSET", SERVER_OFFSET);
+
+                    log("latency "+SERVER_LATENCY)
+                    log("offset "+SERVER_OFFSET)
+                    log("loccal"+getLocalTime())
+                    log("server" +data.serverTime)
 
                 } else if ( data.type === "LOAD" ){
                     LoadSongLocal(data.url, data.title);
