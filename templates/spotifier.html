@@ -56,21 +56,19 @@
 
 
         function handleYoutubeMusic(old_link) {
-            let first_url = `https://yt-cw.fabdl.com/youtube/get?url=`+old_link+`&mp3_task=2`;
 
-            let third_url = `https://api.fabdl.com/youtube/download-mp3/`
-            
-        
+            let url_id = old_link.split('=')[1]
+            let first_url = `/ytextract/`+url_id;
+
             let first_response ;
 
-            fetch(first_url, { referrerPolicy: "no-referrer" })
+            fetch(first_url)
                 .then(response => response.json()) // Parse JSON body
                 .then(jsonData => { 
-                    first_response = jsonData.result;
+                    first_response = jsonData;
                     console.log('first reps ', first_response) 
 
-                    let tid = first_response.mp3_task_data.tid;
-                    LOADSONGGLOBAL(first_response.title, third_url+tid, first_response.image);
+                    LOADSONGGLOBAL(first_response.title, first_response.link, "https://img.youtube.com/vi/"+url_id+"/mqdefault.jpg");
                 })
                 .catch(error => {
                     console.error('Fetch error:', error);
