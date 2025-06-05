@@ -13,7 +13,7 @@
     let PLAY_TIMESTAMP = 0;       // in buffer seconds (seek point)
     let PLAY_SCHEDULED_AT = 0;    // in context seconds (when .start() happened) 
 
-    function LoadSongLocal(audio_url, audio_name){  
+    function LoadSongLocal(audio_url, audio_name, audio_img){  
         LOCALPAUSE(); 
         if ( AUDIO_URL === audio_url ) {
             return;
@@ -31,7 +31,7 @@
         }else{
             loadSongHelper(audio_url).then(buffer => {
                 AUDIO_URL = audio_url;
-                let new_song = new BuntingSong(audio_name, audio_url, buffer)
+                let new_song = new BuntingSong(audio_name, audio_url, buffer, audio_img)
                 LIBRARY.add(new_song);
                 showSong(new_song);
                 generateBuntingSource();
@@ -42,11 +42,12 @@
             });
         } 
         
+        
     }
 
     function BuntingPlay(data) {
         if (!LIBRARY.songs[data.url]) { 
-            alert("audio not ready")
+            alert("song not loaded, click on the song to load it") 
             return;
         }
 
@@ -66,19 +67,15 @@
     function BuntingPause() {
         if (!AUDIO_PLAYING) return;
 
-        try {
-            BuntingSource.stop();
-            AUDIO_PLAYING = false;
+        
+        BuntingSource.stop();
+        AUDIO_PLAYING = false;
 
-            // Update buffer timestamp (how far we’ve played)
-            const playedDuration = BuntingContext.currentTime - PLAY_SCHEDULED_AT;
-            PLAY_TIMESTAMP += playedDuration;
+        // Update buffer timestamp (how far we’ve played)
+        const playedDuration = BuntingContext.currentTime - PLAY_SCHEDULED_AT;
+        PLAY_TIMESTAMP += playedDuration;
 
-            console.log("⏸️ Paused at", PLAY_TIMESTAMP.toFixed(2), "seconds");
-
-        } catch (e) {
-            console.error("Pause error:", e);
-        }
+        console.log("⏸️ Paused at", PLAY_TIMESTAMP.toFixed(2), "seconds");
     } 
 
     function loadSongHelper(url) {
@@ -93,6 +90,7 @@
         BuntingSource.connect(BuntingGainNode);
         BuntingSource.onended = () => {
             AUDIO_PLAYING = false;
+            LOCALPAUSE();
             console.log("🎵 Playback finished");
         };
     }

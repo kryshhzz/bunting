@@ -1,34 +1,7 @@
 {{ define "content" }}
 
     <style> 
-        .audio_form {
-            width : 100%;
-            padding : 1em ;
-        }
-        .audio_form input {
-            background : var(--dark-2);
-            color : var(--wt-80);
-            font-size : .9em;
-            border-radius: .5em;
-            border : none;
-            outline : none;
-            padding : .75em 1em;
-            margin : .25em;
-        }
-        .audio_form button {
-            border : none;
-            outline : none;
-            padding :  .8em 1.15em;
-            margin : .25em;
-            background : transparent;
-            color : var(--b-red);
-            border : .2em solid var(--b-red);
-            font-size : .7em;
-            border-radius: .5em;
-            text-transform: uppercase;
-            letter-spacing: .05em;
-            font-weight: bold;
-        }
+
         .play_pause_btn {
             background: var(--b-red);
             color : var(--white);
@@ -54,18 +27,24 @@
         }
         .floor-top {
             width : 100%;
+            height : 2em;
             background : var(--dark-3);
-            padding : .5em;
 
             display : flex;
             justify-content: center;
-            align-items: center;
+            align-items: center; 
+
+            position : relative;
         }
         .floor-top p {
             text-transform: uppercase;
             font-size : .8em;
             letter-spacing: .1em;
             color : var(--light-5);
+            padding: 0 1.5em;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
         .floor-bottom {
             padding : 1em;
@@ -104,35 +83,57 @@
             width : 100%; 
 
             display : grid;
-            grid-template-columns: 1fr;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
             place-items : center start;
-            grid-gap : .1em;
+            grid-gap : 1em;
+
         }
         .library-cont .tr {
             width : 100%; 
+            aspect-ratio: 1/1; 
 
             display : grid;
-            grid-template-columns: .5fr 1fr;
-            place-items : center start;
+            grid-template-columns: 1fr;
+            grid-template-rows: 1fr;
+            place-items : end start;
             grid-gap : .1em;
-        } 
 
-        .library-cont p{
+            border-radius: 1em;
+            background : var(--dark-2);
+        } 
+        .library-cont .tr img {
+            width : 100%;
+            height : 100%;
+            border-radius: inherit;
+            object-fit: cover;
+
+            grid-row: 1/2;
+            grid-column: 1/2;
+        }
+
+        .library-song-title{
             font-size : .8em;
-            padding : 1em;
+            padding : 1.25em;
             border-radius : .2em;
             color : var(--wt-80);
+            background : linear-gradient(to top, black, transparent);
             width : 100%;
+            height : 100%;
             overflow : hidden;
             text-overflow : ellipsis;
             white-space : nowrap;
-        }
-        .library-cont .tr:nth-child(odd) p {
-            background : var(--dark-3);
-        }
-        .library-cont .tr:nth-child(even) p {
-            background : var(--dark-2);
+            text-align: center;
+
+            grid-row: 1/2;
+            grid-column: 1/2; 
+
+            display : flex;
+            justify-content: center;
+            align-items: flex-end;
         } 
+        .library-song-url {
+            display : none;
+        }
 
         .volume-slider-bowl {
             padding : 1em;
@@ -186,39 +187,45 @@
             border-radius: 50em;
             position: relative;
             z-index : 5;
-        }
+        } 
     </style> 
 
 
     <div class="floor"> 
-        <div class="floor-top">
+        <div class="floor-top"> 
             <p class="footer-current-play-title">No song loaded</p>
         </div>
         <div class="floor-bottom">
             <input type="range" class="volume-slider" max="100" min="0" value="100">
             <button class="play_pause_btn"> <div class="inner_svg play_svg"></div> </button>
         </div>
-    </div>
+    </div> 
 
-    <form class="audio_form"> 
-        <input type="text" class='audio_title' required value="New Song">
-        <input type="text" class="audio_url" required value="https://aac.saavncdn.com/151/d47f0f0edf55c1ec4ea5633b1ff1ba49_160.mp4">
-        <button>load</button>
-    </form> 
+    {{ template "spotifier" . }}
 
-    <div class="library-bowl">
+    
+
+    <div class="library-bowl stiff">
         <div class="library-cont"> 
-            <div class="tr" onclick="LOADSONGGLOBAL(this.querySelector('.library-song-title').innerHTML, this.querySelector('.library-song-url').innerHTML)">
+            <div class="tr" onclick="LOADSONGGLOBAL(this.querySelector('.library-song-title').innerHTML, this.querySelector('.library-song-url').innerHTML, this.querySelector('img').src)">
+                <img src="https://upload.wikimedia.org/wikipedia/en/5/57/Peelings_song.jpg" alt="">
                 <p class="library-song-title">Peelings</p>
                 <p class="library-song-url">https://aac.saavncdn.com/366/2eb21d94241ba0d9e970d808a7dc015d_160.mp4</p>
             </div> 
-            <div class="tr" onclick="LOADSONGGLOBAL(this.querySelector('.library-song-title').innerHTML, this.querySelector('.library-song-url').innerHTML)">
+            <div class="tr" onclick="LOADSONGGLOBAL(this.querySelector('.library-song-title').innerHTML, this.querySelector('.library-song-url').innerHTML, this.querySelector('img').src)">
+                <img src="https://i.ytimg.com/vi/gcYGwcUmjZo/hq720.jpg?sqp=-oaymwEhCK4FEIIDSFryq4qpAxMIARUAAAAAGAElAADIQj0AgKJD&rs=AOn4CLDokTzhL4l-cBTS4mOnrfMqcIIuEw" alt="">
                 <p class="library-song-title">Aayi Nai</p>
                 <p class="library-song-url">https://aac.saavncdn.com/373/9a3ad2173b2e80bc6f9655d1da7c8f27_160.mp4</p>
             </div> 
-            <div class="tr" onclick="LOADSONGGLOBAL(this.querySelector('.library-song-title').innerHTML, this.querySelector('.library-song-url').innerHTML)">
+            <div class="tr" onclick="LOADSONGGLOBAL(this.querySelector('.library-song-title').innerHTML, this.querySelector('.library-song-url').innerHTML, this.querySelector('img').src)">
+                <img src="https://i.ytimg.com/vi/q_rtuBQRQfc/maxresdefault.jpg" alt="">
                 <p class="library-song-title">Uyi Amma</p>
                 <p class="library-song-url">https://aac.saavncdn.com/770/9c18ad89fbb3dff8c2167eda17c50904_160.mp4</p>
+            </div> 
+            <div class="tr" onclick="LOADSONGGLOBAL(this.querySelector('.library-song-title').innerHTML, this.querySelector('.library-song-url').innerHTML, this.querySelector('img').src)">
+                <img src="https://i.scdn.co/image/ab67616d0000b2734bc66095f8a70bc4e6593f4f" alt="">
+                <p class="library-song-title">Levitating</p>
+                <p class="library-song-url">https://aac.saavncdn.com/665/7790c3b9097592113008eaf1031d6e57_160.mp4</p>
             </div> 
 
         </div>
@@ -227,13 +234,6 @@
     <div id="log"></div> 
 
     <script>
-        document.querySelector('.audio_form').addEventListener('submit', function(e){
-            e.preventDefault(); 
-            let url = document.querySelector('.audio_url').value.trim();
-            let title = document.querySelector('.audio_title').value.trim();
-            if (!url) return
-            LOADSONGGLOBAL(title, url);
-        }) 
 
         document.querySelector('.volume-slider').addEventListener('change', function(){
             let vol = this.value;
@@ -248,15 +248,16 @@
         }
 
         function showSong(song) {
-            document.querySelector('.library-cont').innerHTML += `
-                <div class="tr" onclick="LOADSONGGLOBAL(this.querySelector('.library-song-title').innerHTML, this.querySelector('.library-song-url').innerHTML)">
+            document.querySelector('.library-cont').innerHTML = `
+                <div class="tr" onclick="LOADSONGGLOBAL(this.querySelector('.library-song-title').innerHTML, this.querySelector('.library-song-url').innerHTML, this.querySelector('img').src)">
+                    <img src="${song.img}" alt="">
                     <p class="library-song-title">${song.title}</p>
                     <p class="library-song-url">${song.url}</p>
                 </div>
-            `
+            ` + document.querySelector('.library-cont').innerHTML
         }
 
-        function showInFooter(name){
+        function showInFooter(name="NO SONG LOADED"){
             document.querySelector(".footer-current-play-title").innerHTML = name;
         }
         

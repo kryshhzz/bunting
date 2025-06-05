@@ -55,7 +55,7 @@
                     log("server" +data.serverTime)
 
                 } else if ( data.type === "LOAD" ){
-                    LoadSongLocal(data.url, data.title);
+                    LoadSongLocal(data.url, data.title, data.img);
 
                 } else if ( data.type == "VOLUME" ){
                     setBuntingVolume(data.volume);
@@ -86,11 +86,12 @@
             toggleGlobalPlayPause();
         });
 
-        function LOADSONGGLOBAL(to_be_loaded_title, to_be_loaded_url){
+        function LOADSONGGLOBAL(to_be_loaded_title, to_be_loaded_url, to_be_loaded_img=""){
             sendMessage({
                     type : "LOAD",
                     url : to_be_loaded_url,
                     title : to_be_loaded_title,
+                    img : to_be_loaded_img,
             }); 
         }
 

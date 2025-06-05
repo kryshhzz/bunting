@@ -79,7 +79,7 @@
             left : 0;
             right : 0;
             background : transparent;
-            backdrop-filter: blur(1em);
+            backdrop-filter: blur(8em);
             padding : 1.5em;
 
             z-index : 10;
@@ -118,9 +118,15 @@
         .hide {
             display : none !important;
         }
+        .stiff {
+            width : 100%;
+            max-width : 800px;
+            margin : 0 auto;
+        }
 
         main {
             padding : 1em;
+            margin-bottom : 10em;
         }
 
     </style>
@@ -135,7 +141,6 @@
     <main class="hide">
         {{ block "content" . }}{{ end }}
     </main>  
-
 
     <div class="starter hide">
         <div class="inner-starter">

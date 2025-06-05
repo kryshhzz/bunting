@@ -1,0 +1,81 @@
+{{ define "spotifier" }}
+    <style>
+        .audio_form {
+            width : 100%;
+            padding : 1em ;
+        }
+        .audio_form input {
+            background : var(--dark-2);
+            color : var(--wt-60);
+            font-size : .9em;
+            border-radius: .5em;
+            border : none;
+            outline : none;
+            padding : .75em 1em;
+            margin : .25em;
+
+            width : 100%;
+            max-width : 400px;
+        }
+        .audio_form button {
+            border : none;
+            outline : none;
+            padding :  .8em 2.5em;
+            margin : .25em;
+            background : transparent;
+            color : var(--dark-1);
+            background : var(--light-3);
+            font-size : .7em;
+            border-radius: 30em;
+            text-transform: uppercase;
+            letter-spacing: .05em;
+            font-weight: bold;
+        }
+    </style>
+    <form class="audio_form stiff"> 
+        <input type="text" class='audio_title' required value="patakha" hidden>
+        <input type="text" class="audio_url" required value="https://www.youtube.com/watch?v=JtPbk7WvHAQ">
+        <button>fetch from youtube</button>
+    </form> 
+
+    <script>
+        document.querySelector('.audio_form').addEventListener('submit', function(e){
+            e.preventDefault(); 
+            let url = document.querySelector('.audio_url').value.trim();
+            let title = document.querySelector('.audio_title').value.trim();
+            if (!url) return 
+
+            // check if url is of youtube music
+            let url_domain = url.split('/')[2];
+            if ( url_domain.includes("www.youtube.com") || url_domain.includes("music.youtube.com") || url_domain.includes("m.youtube.com") || url_domain.includes("youtu.be") ){
+                handleYoutubeMusic(url);
+            }else{
+                LOADSONGGLOBAL(title, url);
+            }
+        }) 
+
+
+        function handleYoutubeMusic(old_link) {
+            let first_url = `https://yt-cw.fabdl.com/youtube/get?url=`+old_link+`&mp3_task=2`;
+
+            let third_url = `https://api.fabdl.com/youtube/download-mp3/`
+            
+        
+            let first_response ;
+
+            fetch(first_url, { referrerPolicy: "no-referrer" })
+                .then(response => response.json()) // Parse JSON body
+                .then(jsonData => { 
+                    first_response = jsonData.result;
+                    console.log('first reps ', first_response) 
+
+                    let tid = first_response.mp3_task_data.tid;
+                    LOADSONGGLOBAL(first_response.title, third_url+tid, first_response.image);
+                })
+                .catch(error => {
+                    console.error('Fetch error:', error);
+                });
+
+        }
+    </script>
+{{ end }}
