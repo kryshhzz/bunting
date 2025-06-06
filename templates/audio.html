@@ -95,11 +95,13 @@
         };
     }
 
-    function setBuntingVolume(vol) { 
+    function setBuntingVolume(vol, isSelf=false) { 
         vol = vol / 100
         currentVolume = Math.min(1, Math.max(0, vol)); 
         BuntingGainNode.gain.setValueAtTime(currentVolume, BuntingContext.currentTime); 
-        document.querySelector('.volume-slider').value = vol * 100;
+        if (!isSelf) {
+            document.querySelector('.volume-slider').value = vol * 100;
+        }
     }
 </script>
 

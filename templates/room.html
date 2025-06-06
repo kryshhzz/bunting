@@ -83,19 +83,19 @@
             width : 100%; 
 
             display : grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
             place-items : center start;
-            grid-gap : 1em;
-
+            grid-gap : 1.5em;
         }
         .library-cont .tr {
             width : 100%; 
 
             display : grid;
-            grid-template-columns: 1fr;
+            grid-template-columns: 4em 1fr;
             place-items : end start;
-            grid-gap : .1em;
-            background : transparent;
+            grid-gap : .5em; 
+
+            cursor : pointer;
         } 
         .library-cont .tr img {
             width : 100%;
@@ -108,8 +108,10 @@
 
         .library-song-title{
             font-size : .8em;
-            padding : .5em ;
-            color : var(--wt-80);
+            padding : .5em 1em;
+            color : var(--wt-60);
+            border-radius: .25em;
+            background : var(--dark-2);
 
             width : 100%;
             height : 100%;
@@ -230,12 +232,13 @@
 
     <script>
 
-        document.querySelector('.volume-slider').addEventListener('change', function(){
-            let vol = this.value;
+        document.querySelector('.volume-slider').addEventListener('input', function(){
+            let vol = this.value; 
+            setBuntingVolume(vol,true);
             sendMessage({
                 type : "VOLUME",
                 volume : vol,
-            });
+            }); 
         })
 
         function toggleVolume(){
