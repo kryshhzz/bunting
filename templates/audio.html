@@ -52,7 +52,7 @@
         }
 
         generateBuntingSource(); // re-create node
-        let timeuntilplay = ( ( data.scheduledTime - SERVER_OFFSET  ) - getLocalTime() ) / 1000;
+        let timeuntilplay = ( data.scheduledTime  - getSyncedTime() ) / 1000;
         const when = BuntingContext.currentTime + timeuntilplay;
         PLAY_TIMESTAMP = data.timestamp;
         BuntingSource.start(when, PLAY_TIMESTAMP);

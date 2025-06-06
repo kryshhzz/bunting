@@ -25,8 +25,43 @@
             return Date.now() + (performance.now() % 1);
         }
 
+        function getSyncedTime(){
+            return getLocalTime() + SERVER_OFFSET;
+        }
+
         function getPlayedTill(){
             return PLAY_TIMESTAMP;
+        } 
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        async function SendDelayRequests(){
+            let reqnos = 6;
+
+            for ( let i = 0; i<reqnos; i++ ){
+                //  send delay request  
+                sendMessage({
+                        type : "DELAYREQUEST", 
+                        delayReqSentAt : getLocalTime(), // t1
+                }); 
+                await sleep(250);
+            }
+
+            await sleep(250);
+
+            let avg_server_diff = SERVER_TIME_DIFFS / reqnos;
+            let avg_rtt = ROUND_TRIPS / reqnos;
+
+            SERVER_OFFSET = avg_server_diff - avg_rtt / 2;
+
+            
+            console.log("average RTT ", avg_rtt);
+            console.log("offset ", SERVER_OFFSET);
+
+            log("average RTT "+ avg_rtt);
+            log("offset "+SERVER_OFFSET);
+
         }
 
     </script>

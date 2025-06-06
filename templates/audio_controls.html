@@ -3,7 +3,6 @@
         const play_pause_btn = document.querySelector(".play_pause_btn");
 
         let SERVER_OFFSET = 0;
-        let SENTTIME = 0;
         let SOCKET = ""; 
 
         PLAY_TIMESTAMP = 0;
@@ -11,16 +10,18 @@
         AUDIO_LOADED = false; 
         AUDIO_URL = "";
 
+        ROUND_TRIPS = 0
+        SERVER_TIME_DIFFS = 0
+
         function ConnectToWebSocket() {
             SOCKET = new WebSocket("wss://chat-webserver.glitch.me/");
 
-            SOCKET.addEventListener("open", function () {
+            SOCKET.addEventListener("open", function () { 
+
+                SendDelayRequests();
+
                 showContent();
                 console.log("✅ Connected to WebSocket server");
-
-                //  sending request for latency 
-                sendMessage({"type":"LATENCY"});
-                SENTTIME = getLocalTime() ;
             });
 
             SOCKET.addEventListener("message", async function (event) {
@@ -37,22 +38,17 @@
                 } else if (data.type == 'PAUSE') {
                     LOCALPAUSE();
 
-                } else if (data.type == "SERVERTIME") { 
+                } else if (data.type == "DELAYRESPONSE") {  
 
-                    // finding latency
-                    const RECEIVEDTIME = Date.now() + (performance.now() % 1);
-                    const SERVER_LATENCY = (RECEIVEDTIME - SENTTIME) / 2;
-                    SERVER_OFFSET = data.serverTime - (SENTTIME + SERVER_LATENCY);
+                    let clientRecievedAt = getLocalTime(); // T3
+                    // delayReqRecievedAt T2
 
-                    console.log("SENTTIME", SENTTIME);
-                    console.log("RECEIVEDTIME", RECEIVEDTIME);
-                    console.log("SERVER_LATENCY", SERVER_LATENCY);
-                    console.log("SERVER_OFFSET", SERVER_OFFSET);
+                    let RoundTriptime = clientRecievedAt - data.delayReqSentAt; 
 
-                    log("latency "+SERVER_LATENCY)
-                    log("offset "+SERVER_OFFSET)
-                    log("loccal"+getLocalTime())
-                    log("server" +data.serverTime)
+                    ROUND_TRIPS += RoundTriptime
+                    SERVER_TIME_DIFFS += data.delayReqRecievedAt - data.delayReqSentAt 
+
+                    console.log(ROUND_TRIPS, SERVER_TIME_DIFFS)
 
                 } else if ( data.type === "LOAD" ){
                     LoadSongLocal(data.url, data.title, data.img);
