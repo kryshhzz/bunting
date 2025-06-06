@@ -47,17 +47,21 @@
 
             // check if url is of youtube music
             let url_domain = url.split('/')[2];
-            if ( url_domain.includes("www.youtube.com") || url_domain.includes("music.youtube.com") || url_domain.includes("m.youtube.com") || url_domain.includes("youtu.be") ){
-                handleYoutubeMusic(url);
+            if ( url_domain.includes("www.youtube.com") || url_domain.includes("music.youtube.com") || url_domain.includes("m.youtube.com") || url_domain.includes("youtu.be") ){ 
+                if ( url_domain.includes("youtu.be") ){
+                    handleYoutubeMusic(url.split("/")[3].split('?')[0]);
+                } else {
+                    handleYoutubeMusic(url.split('=')[1])
+                }
             }else{
                 LOADSONGGLOBAL(title, url);
             }
         }) 
 
 
-        function handleYoutubeMusic(old_link) {
+        function handleYoutubeMusic(url_id) {
 
-            let url_id = old_link.split('=')[1]
+            
             let first_url = `/ytextract/`+url_id;
 
             let first_response ;
