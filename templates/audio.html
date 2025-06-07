@@ -31,7 +31,7 @@
                 let new_song = new BuntingSong(audio_name, audio_url, buffer, audio_img, audio_uid)
                 LIBRARY.add(new_song); 
                 setActiveAudio( new_song );  
-                if ( data.preset == "false" ) showSong(new_song);  
+                if ( data.preset == "false" || data.preset == false ) showSong(new_song);  
 
                 u(".aud_id_"+audio_uid).removeClass("loading-tr")
                 u(".aud_id_"+audio_uid).addClass("loaded-tr")
