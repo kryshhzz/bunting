@@ -1,26 +1,30 @@
 {{ define "audio_controls" }}
     <script>
-        const play_pause_btn = document.querySelector(".play_pause_btn");
+        const play_pause_btn = u(".play_pause_btn");
 
         let SERVER_OFFSET = 0;
         let SOCKET = ""; 
 
-        PLAY_TIMESTAMP = 0;
-        AUDIO_PLAYING = false;
-        AUDIO_LOADED = false; 
-        AUDIO_URL = "";
-
         ROUND_TRIPS = 0
-        SERVER_TIME_DIFFS = 0
+        SERVER_TIME_DIFFS = 0 
+
+        function setLogoText(txt){
+            u('.logo-text').html(txt); 
+        }
 
         function ConnectToWebSocket() {
-            SOCKET = new WebSocket("wss://chat-webserver.glitch.me/");
+            SOCKET = new WebSocket("wss://chat-webserver.glitch.me/"); 
+
+            setLogoText("connecting...")
 
             SOCKET.addEventListener("open", function () { 
-
+                setLogoText('Bunting');
                 SendDelayRequests();
-
-                showContent();
+                
+                if ( first_time ) {
+                    showContent();
+                    first_time = false;
+                }
                 console.log("✅ Connected to WebSocket server");
             });
 
@@ -31,12 +35,10 @@
                 if (data.type === 'PLAY') {  
 
                     log("play at "+data.scheduledTime)
-
-                    AUDIO_URL = data.url;
-                    LOCALPLAY(data); 
+                    BuntingPlay(data);
 
                 } else if (data.type == 'PAUSE') {
-                    LOCALPAUSE();
+                    BuntingPause();
 
                 } else if (data.type == "DELAYRESPONSE") {  
 
@@ -51,7 +53,7 @@
                     console.log(ROUND_TRIPS, SERVER_TIME_DIFFS)
 
                 } else if ( data.type === "LOAD" ){
-                    LoadSongLocal(data.url, data.title, data.img);
+                    LoadSongLocal(data);
 
                 } else if ( data.type == "VOLUME" ){
                     setBuntingVolume(data.volume);
@@ -59,14 +61,19 @@
             });
 
             SOCKET.addEventListener("error", function (event) {
+                setLogoText('error ws');
                 console.log("❌ WebSocket error:", event);
             });
 
             SOCKET.addEventListener("close", function () {
                 console.log("🔌 WebSocket connection closed"); 
-                alert("disconnected, please refresh !")
-                // LOCALPAUSE();
-                // ConnectToWebSocket();
+                setLogoText("disconnected")
+
+                ROUND_TRIPS = 0
+                SERVER_TIME_DIFFS = 0
+                SERVER_OFFSET = 0
+
+                ConnectToWebSocket();
             });
         }
 
@@ -78,44 +85,36 @@
             console.log(`📤 You: ${payload_s}`);
         }
 
-        play_pause_btn.addEventListener('click', () => {
+        play_pause_btn.on('click', () => {
             toggleGlobalPlayPause();
         });
 
-        function LOADSONGGLOBAL(to_be_loaded_title, to_be_loaded_url, to_be_loaded_img=""){
+        function LOADSONGGLOBAL(to_be_loaded_title, to_be_loaded_url, to_be_loaded_img="", to_be_loaded_uid, presetAudio=false){
             sendMessage({
                     type : "LOAD",
                     url : to_be_loaded_url,
                     title : to_be_loaded_title,
                     img : to_be_loaded_img,
+                    uid : to_be_loaded_uid,
+                    preset : presetAudio,
             }); 
         }
 
-        function LOCALPLAY(data) {
-            document.querySelector('.inner_svg').classList.remove('play_svg');
-            BuntingPlay(data);
-        }
-
-        function LOCALPAUSE() {
-            document.querySelector('.inner_svg').classList.add('play_svg');
-            BuntingPause();
-        }
-
         function toggleGlobalPlayPause() {
-            if (!AUDIO_LOADED) {
+            if (!isActiveAudioLoaded()) {
                 alert('load audio')
                 return;
             }
 
-            if (AUDIO_PLAYING) {
+            if (isActiveAudioPlaying()) {
                 sendMessage({
                     type:'PAUSE',
-                    url : AUDIO_URL,
+                    uid : ActiveAudio.Audio.uid,
                 });
             } else { 
                 sendMessage({
                     type:'PLAY',
-                    url : AUDIO_URL,
+                    uid : ActiveAudio.Audio.uid,
                     timestamp : getPlayedTill(),
                 });
             }

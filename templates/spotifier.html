@@ -43,10 +43,13 @@
     </form> 
 
     <script>
-        document.querySelector('.audio_form').addEventListener('submit', function(e){
+        u('.audio_form').on('submit', function(e){
             e.preventDefault(); 
+
             let url = document.querySelector('.audio_url').value.trim();
-            let title = document.querySelector('.audio_title').value.trim();
+            let title  = document.querySelector('.audio_title').value.trim();
+
+
             if (!url) return 
 
             // check if url is of youtube music
@@ -60,12 +63,12 @@
             }else{
                 LOADSONGGLOBAL(title, url);
             }
+
         }) 
 
 
         function handleYoutubeMusic(url_id) {
 
-            
             let first_url = `/ytextract/`+url_id;
 
             let first_response ;
@@ -76,7 +79,7 @@
                     first_response = jsonData;
                     console.log('first reps ', first_response) 
 
-                    LOADSONGGLOBAL(first_response.title, first_response.link, "https://img.youtube.com/vi/"+url_id+"/mqdefault.jpg");
+                    LOADSONGGLOBAL(first_response.title, first_response.link, "https://img.youtube.com/vi/"+url_id+"/mqdefault.jpg", url_id);
                 })
                 .catch(error => {
                     console.error('Fetch error:', error);

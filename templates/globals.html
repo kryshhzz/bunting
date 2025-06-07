@@ -1,0 +1,44 @@
+{{ define "globals" }}
+
+    <script>
+
+        let ActiveAudio = {
+            Audio : "",
+            TimeStamp : 0,
+            Loaded : false,
+            Playing : false,
+        }
+
+        function setActiveAudio(audio, timestamp=0, loaded = false, playing = false) {
+            ActiveAudio.Audio = audio;
+            ActiveAudio.TimeStamp = timestamp;
+            ActiveAudio.Loaded = loaded;
+            ActiveAudio.Playing = playing;
+            showInFooter(audio.title);
+        } 
+
+        function setActiveAudioLoaded(yes=true){
+            ActiveAudio.Loaded = yes;
+            return ActiveAudio.Loaded;
+        }
+        function isActiveAudioLoaded(){
+            return ActiveAudio.Loaded;
+        }
+
+        function setActiveAudioPlaying(yes=true){
+            ActiveAudio.Playing = yes; 
+            if ( yes ) {
+                u('.inner_svg').removeClass('play_svg');
+            }else{
+                u('.inner_svg').addClass('play_svg');
+            }
+        }
+
+        function isActiveAudioPlaying(){
+            return ActiveAudio.Playing;
+        }
+
+
+    </script>
+
+{{ end }}

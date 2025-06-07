@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/umbrellajs"></script>
 
     <title>Bunting</title>
 
@@ -135,12 +136,13 @@
     <header>
         <div class="logo">
             <img src="/static/bunting.png" alt="">
-            <p class="logo-text">Loading ...</p>
+            <p class="logo-text">Loading...</p>
         </div>
     </header>
     <main class="hide">
         {{ block "content" . }}{{ end }}
-    </main>  
+    </main>   
+
 
     <div class="starter hide">
         <div class="inner-starter">
@@ -148,21 +150,22 @@
             <button onclick="toggleStarter()">go</button>
         </div>
     </div>
-    <script>
-        starter = document.querySelector('.starter')
+    <script> 
+        let first_time = true;
+        
+        let starter = u('.starter');
 
         function toggleStarter() {
-            starter.classList.toggle('hide')
+            starter.toggleClass('hide')
         }
 
         function showContent() {
-            document.querySelector('main').classList.remove('hide')
-            document.querySelector('.logo-text').innerHTML = 'Bunting' 
-            toggleStarter()
+            u('main').removeClass('hide')
+            toggleStarter();
         } 
 
         function log(txt) {
-            document.querySelector('#log').innerHTML += '<p>' + txt + '</p>';
+            u('#log').append(`<p> ${txt} </p>`);
         }
 
     </script>

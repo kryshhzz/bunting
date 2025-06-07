@@ -96,21 +96,24 @@
             grid-gap : .5em; 
 
             cursor : pointer;
+
+            position : relative;
         } 
         .library-cont .tr img {
             width : 100%;
             height : 100%;
-            border-radius: .25em;
+            border-radius: .5em;
             object-fit: cover;
 
             aspect-ratio : 1/1;
+
         }
 
         .library-song-title{
             font-size : .8em;
             padding : .5em 1em;
             color : var(--wt-60);
-            border-radius: .25em;
+            border-radius: .5em;
             background : var(--dark-2);
 
             width : 100%;
@@ -120,18 +123,39 @@
             white-space : nowrap;
             text-align: left;
 
-            text-transform : uppercase;
-            font-weight : 600;
-            letter-spacing : .1em;
-
             padding-top : 3em;
 
             transition : .5s;
         } 
+        .loading-tr .library-song-title, .loaded-tr .library-song-title {
+            position : relative;
+        }
+        .loading-tr .library-song-title::after{
+            content : "Loading...";
+            position : absolute;
+            top :0;
+            left : 0;
+            color : red;
+            padding : .5em 1em;
+        }
+
+        .loaded-tr .library-song-title::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: green;
+            width: 1em;
+            aspect-ratio: 1 / 1;
+            clip-path: circle(12% at 50% 50%);
+            padding: .75em .7em;
+        }
+
+
         .library-song-title:hover {
             background : var(--dark-3);
         }
-        .library-song-url {
+        .library-song-url, .library-song-uid {
             display : none;
         }
 
@@ -187,7 +211,9 @@
             border-radius: 50em;
             position: relative;
             z-index : 5;
-        } 
+        }  
+
+
     </style> 
 
 
@@ -207,25 +233,21 @@
 
     <div class="library-bowl stiff">
         <div class="library-cont"> 
-            <div class="tr" onclick="LOADSONGGLOBAL(this.querySelector('.library-song-title').innerHTML, this.querySelector('.library-song-url').innerHTML, this.querySelector('img').src)">
+            <div class="tr aud_id_peelings" onclick='handleTrClick(this)' uid="peelings" url="https://aac.saavncdn.com/366/2eb21d94241ba0d9e970d808a7dc015d_160.mp4" isPreset="true" >
                 <img src="https://upload.wikimedia.org/wikipedia/en/5/57/Peelings_song.jpg" alt="">
                 <p class="library-song-title">Peelings</p>
-                <p class="library-song-url">https://aac.saavncdn.com/366/2eb21d94241ba0d9e970d808a7dc015d_160.mp4</p>
             </div> 
-            <div class="tr" onclick="LOADSONGGLOBAL(this.querySelector('.library-song-title').innerHTML, this.querySelector('.library-song-url').innerHTML, this.querySelector('img').src)">
+            <div class="tr aud_id_aayinai" onclick='handleTrClick(this)' uid="aayinai" url="https://aac.saavncdn.com/373/9a3ad2173b2e80bc6f9655d1da7c8f27_160.mp4" isPreset="true">
                 <img src="https://i.ytimg.com/vi/gcYGwcUmjZo/hq720.jpg?sqp=-oaymwEhCK4FEIIDSFryq4qpAxMIARUAAAAAGAElAADIQj0AgKJD&rs=AOn4CLDokTzhL4l-cBTS4mOnrfMqcIIuEw" alt="">
                 <p class="library-song-title">Aayi Nai</p>
-                <p class="library-song-url">https://aac.saavncdn.com/373/9a3ad2173b2e80bc6f9655d1da7c8f27_160.mp4</p>
             </div> 
-            <div class="tr" onclick="LOADSONGGLOBAL(this.querySelector('.library-song-title').innerHTML, this.querySelector('.library-song-url').innerHTML, this.querySelector('img').src)">
+            <div class="tr aud_id_uyiamma" onclick='handleTrClick(this)' uid="uyiamma" url="https://aac.saavncdn.com/770/9c18ad89fbb3dff8c2167eda17c50904_160.mp4" isPreset="true">
                 <img src="https://i.ytimg.com/vi/q_rtuBQRQfc/maxresdefault.jpg" alt="">
                 <p class="library-song-title">Uyi Amma</p>
-                <p class="library-song-url">https://aac.saavncdn.com/770/9c18ad89fbb3dff8c2167eda17c50904_160.mp4</p>
             </div> 
-            <div class="tr" onclick="LOADSONGGLOBAL(this.querySelector('.library-song-title').innerHTML, this.querySelector('.library-song-url').innerHTML, this.querySelector('img').src)">
+            <div class="tr aud_id_levitating" onclick='handleTrClick(this)' uid="levitating" url="https://aac.saavncdn.com/665/7790c3b9097592113008eaf1031d6e57_160.mp4" isPreset="true">
                 <img src="https://i.scdn.co/image/ab67616d0000b2734bc66095f8a70bc4e6593f4f" alt="">
                 <p class="library-song-title">Levitating</p>
-                <p class="library-song-url">https://aac.saavncdn.com/665/7790c3b9097592113008eaf1031d6e57_160.mp4</p>
             </div> 
 
         </div>
@@ -233,38 +255,48 @@
 
     <div id="log"></div> 
 
+
     <script>
 
-        document.querySelector('.volume-slider').addEventListener('input', function(){
+        u('.volume-slider').on('input', function(){
             let vol = this.value; 
             setBuntingVolume(vol,true);
             sendMessage({
                 type : "VOLUME",
                 volume : vol,
             }); 
-        })
+        });
 
         function toggleVolume(){
-            document.querySelector('.volume-slider').classList.toggle('hide');
+            u('.volume-slider').toggleClass('hide');
         }
 
-        function showSong(song) {
-            document.querySelector('.library-cont').innerHTML = `
-                <div class="tr" onclick="LOADSONGGLOBAL(this.querySelector('.library-song-title').innerHTML, this.querySelector('.library-song-url').innerHTML, this.querySelector('img').src)">
+        function showSong(song) { 
+            u('.library-cont').prepend(`
+                <div class="tr aud_id_${song.uid}" uid="${song.uid}" url="${song.url}" isPreset="false" onclick='handleTrClick(this)'>
                     <img src="${song.img}" alt="">
                     <p class="library-song-title">${song.title}</p>
-                    <p class="library-song-url">${song.url}</p>
                 </div>
-            ` + document.querySelector('.library-cont').innerHTML
+            `);
+        } 
+
+
+        function handleTrClick(ctg){ 
+            console.log("cleikkdkd")
+            let tg = ctg.closest(".tr");
+            console.log(tg)  
+            if ( !tg.classList.contains(".loaded-tr")) tg.classList.add("loading-tr")
+            LOADSONGGLOBAL(tg.querySelector('.library-song-title').innerHTML, tg.getAttribute("url"), tg.querySelector('img').src, tg.getAttribute('uid'), tg.getAttribute("isPreset"))
         }
 
+
         function showInFooter(name="NO SONG LOADED"){
-            document.querySelector(".footer-current-play-title").innerHTML = name;
+            u(".footer-current-play-title").html(name);
         }
         
     </script>
 
-    
+    {{ template "globals" . }}
     {{ template "audio_controls" . }}
     {{ template "audio" . }}
 

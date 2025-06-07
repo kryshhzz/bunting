@@ -3,11 +3,13 @@
     <script> 
 
         class BuntingSong {
-            constructor(title, url, buffer, img="") {
+            constructor(title, url, buffer, img="", uid="") {
                 this.title = title;
                 this.url = url;
                 this.buffer = buffer;
                 this.img = img;
+                if ( uid == "" ) this.uid = Math.random().toString(36).slice(2, 8);
+                else this.uid = uid;
             }
         }
 
@@ -16,7 +18,10 @@
                 this.songs = {};
             }
             add(song) {
-                this.songs[song.url] = song; 
+                this.songs[song.uid] = song; 
+            } 
+            get(uid) {
+                return this.songs[uid];
             }
         } 
         LIBRARY = new library(); 
@@ -30,7 +35,7 @@
         }
 
         function getPlayedTill(){
-            return PLAY_TIMESTAMP;
+            return ActiveAudio.TimeStamp;
         } 
         function sleep(ms) {
             return new Promise(resolve => setTimeout(resolve, ms));
