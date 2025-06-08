@@ -14,7 +14,12 @@
         let audio_url = data.url;
         let audio_name = data.title;
         let audio_img = data.img;
-        let audio_uid = data.uid;
+        let audio_uid; 
+        if ( "uid" in data ){
+            audio_uid = data.uid;
+        }else{
+            audio_uid = this.uid = Math.random().toString(36).slice(2, 8);
+        }
         
         BuntingPause();
 

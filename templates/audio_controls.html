@@ -15,7 +15,8 @@
         function ConnectToWebSocket() {
             SOCKET = new WebSocket("wss://chat-webserver.glitch.me/"); 
 
-            setLogoText("connecting...")
+            setLogoText("connecting...") 
+            // test_spotify();
 
             SOCKET.addEventListener("open", function () { 
                 setLogoText('Bunting');
