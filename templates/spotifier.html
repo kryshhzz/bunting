@@ -1,6 +1,6 @@
 {{ define "spotifier" }}
     <style>
-        .audio_form {
+        .audio_form, .audio_form_spotify {
             width : 100%;
             padding : .35em 1em .35em 1.5em; 
 
@@ -12,7 +12,7 @@
             background : var(--dark-2);
             border-radius: 10em;
         }
-        .audio_form input {
+        .audio_form input , .audio_form_spotify input {
             width : 100%;
             background : inherit;
             color : var(--wt-60);
@@ -21,7 +21,7 @@
             outline : none;
             margin : .25em;
         }
-        .audio_form button {
+        .audio_form button , .audio_form_spotify button{
             border : none;
             outline : none;
             padding :  .3em 1.5em;
@@ -34,13 +34,64 @@
             text-transform: uppercase;
             letter-spacing: .05em;
             font-weight: bold;
+        }  
+
+        .audio_form_spotify {
+            margin-top : 1em;
         }
+
+        .spotify_results {
+            width : 100%;
+            border-radius : 1em;
+            margin : 1em auto;
+            padding : 0 1.5em;
+
+            display : flex;
+            flex-direction: column;
+            justify-content : flex-start;
+            align-items: center;
+            gap : 1em;
+        }
+        .spotify_result {
+            width : 100%;
+            display : flex;
+            justify-content : flex-start;
+            align-items: center;
+            gap :1em; 
+            cursor : pointer;
+        }
+        .spotify_result img {
+            width : 2em;
+            border-radius: .2em;
+        }
+        .spotify_result p {
+            font-size : .9em;
+            color : var(--wt-60);
+            width : 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            text-align: left;
+        }
+
     </style>
     <form class="audio_form stiff"> 
         <input type="text" class='audio_title' required value="default" hidden>
         <input type="text" class="audio_url" required value="" placeholder="Enter Youtube Video Link">
         <button>></button>
-    </form> 
+    </form>  
+
+    <form class="audio_form_spotify stiff"> 
+        <input type="text" class='audio_title_spotify' required value="" placeholder="Search Song Name">
+        <button>></button>
+    </form>
+    <div class="spotify_results stiff">
+        <!-- <div class="spotify_result" url="sfdb">
+            <img src="https://i.scdn.co/image/ab67616d0000b2737b9888dc365b8f957c63df14" alt="">
+            <p>title</p>
+        </div> -->
+    </div>
+
 
     <script>
         u('.audio_form').on('submit', function(e){
@@ -69,7 +120,65 @@
                 LOADSONGGLOBAL(title, url);
             }
 
-        }) 
+        })  
+
+
+        u('.audio_form_spotify').on('submit', function(e){
+            e.preventDefault();
+            let title = document.querySelector('.audio_title_spotify').value.trim(); 
+
+            fetch("https://api.cratehackers.com/magicplaylist/magicPlaylistToken")
+                            .then(response => response.text())
+                            .then(bearer => {
+                                
+                                fetch("https://api.spotify.com/v1/search?q="+title+"&type=track&limit=5",{
+                                    method: 'GET',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'Authorization': "Bearer "+bearer,
+                                        },
+                                    })
+                                    .then(response => response.json()) // Parse JSON body
+                                    .then(jsonData => {  
+
+                                        let items = jsonData.tracks.items;
+                                        console.log(items) 
+
+                                        u('.spotify_results').html("")
+
+                                        for ( let item of items ){ 
+
+                                            console.log(item)
+
+                                            let s_name = item.name;
+                                            let s_url = item.external_urls.spotify;
+                                            let s_img = item.album.images[item.album.images.length-1].url;
+
+                                            u('.spotify_results').append(`
+                                                <div class="spotify_result" url='${s_url}' onclick='handleSpotifyMusic(this.getAttribute("url"))' >
+                                                    <img src="${s_img}" alt="">
+                                                    <p>${s_name}</p>
+                                                </div>
+                                            `)
+                                        }
+
+                                    })
+                                    .catch(error => {
+                                        console.error('Fetch error:', error);
+                                    });
+
+
+
+
+                            })
+                            .catch(error => {
+                                console.error('bearer gen error :', error);
+                            });
+
+            
+            
+
+        })
 
 
         function handleYoutubeMusic(url_id) {
