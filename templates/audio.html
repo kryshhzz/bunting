@@ -27,11 +27,15 @@
             generateBuntingSource();
             log("audio loaded from library cache") 
         }else{
-            loadSongHelper(audio_url).then(buffer => {
-                let new_song = new BuntingSong(audio_name, audio_url, buffer, audio_img, audio_uid)
-                LIBRARY.add(new_song); 
-                setActiveAudio( new_song );  
-                if ( data.preset == "false" || data.preset == false ) showSong(new_song);  
+            let buffer = null;
+            let new_song = new BuntingSong(audio_name, audio_url, buffer, audio_img, audio_uid);
+            if ( data.preset == "false" || data.preset == false ) showSong(new_song); 
+            u(".aud_id_"+audio_uid).addClass("loading-tr")
+
+            loadSongHelper(audio_url).then(buffer => { 
+                new_song.buffer = buffer;
+                LIBRARY.add(new_song);
+                setActiveAudio( LIBRARY.get(audio_uid) );     
 
                 u(".aud_id_"+audio_uid).removeClass("loading-tr")
                 u(".aud_id_"+audio_uid).addClass("loaded-tr")
@@ -69,14 +73,19 @@
     }
 
     function BuntingPause() {
-        if (!isActiveAudioPlaying()) return;
+        if (!isActiveAudioPlaying()) return; 
         
         BuntingSource.stop();
-        setActiveAudioPlaying(false);
+        setActiveAudioPlaying(false); 
 
         // Update buffer timestamp (how far we’ve played)
         const playedDuration = BuntingContext.currentTime - PLAY_SCHEDULED_AT;
-        ActiveAudio.TimeStamp += playedDuration;
+        ActiveAudio.TimeStamp += playedDuration; 
+
+        if ( ActiveAudio.TimeStamp >= ActiveAudio.Audio.buffer.duration ) {
+            ActiveAudio.TimeStamp = 0;
+            setSliderCurrent(0);
+        }
 
         console.log("⏸️ Paused at", ActiveAudio.TimeStamp.toFixed(2), "seconds");
     } 
@@ -92,7 +101,7 @@
         BuntingSource.buffer = ActiveAudio.Audio.buffer;
         BuntingSource.connect(BuntingGainNode);
         BuntingSource.onended = () => {
-            BuntingPause();
+            BuntingPause(); 
             console.log("🎵 Playback finished");
         };
     }

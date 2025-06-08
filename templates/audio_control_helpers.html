@@ -60,7 +60,6 @@
 
             SERVER_OFFSET = avg_server_diff - avg_rtt / 2;
 
-            
             console.log("average RTT ", avg_rtt);
             console.log("offset ", SERVER_OFFSET);
 
@@ -68,6 +67,59 @@
             log("offset "+SERVER_OFFSET);
 
         }
+
+        let isDragging = false;
+        
+        function audioSliderStart(){
+
+            let elapsed;  
+
+            if ( isDragging ) {
+                return;
+            }
+
+            const slider = document.querySelector('.audio-slider');
+            if (isActiveAudioPlaying()) {
+                elapsed = BuntingContext.currentTime - PLAY_SCHEDULED_AT;
+                slider.value = Math.min(ActiveAudio.TimeStamp + elapsed, slider.max);
+            } else {
+                slider.value = Math.min(ActiveAudio.TimeStamp, slider.max);
+            }
+
+            animationFrameId = requestAnimationFrame(audioSliderStart);
+        }
+
+        let audioSliderStop = () => { 
+            cancelAnimationFrame(animationFrameId);
+            animationFrameId = null;
+        }
+
+        function setSliderMax(duration){
+            const slider = document.querySelector('.audio-slider');
+            slider.max = duration;
+        }
+        
+        function setSliderCurrent(ts){ 
+            console.log("current t s ", ts)
+            const slider = document.querySelector('.audio-slider');
+            slider.value = ts;
+        }
+
+        u('.audio-slider').on('change', function(){
+            toggleGlobalPause();
+            sendMessage({
+                type : "TIMESTAMP",
+                timestamp : parseInt(document.querySelector('.audio-slider').value,10),
+            }); 
+        })
+
+        u(".audio-slider").on("touchstart mousedown", () => {
+            isDragging = true;
+        });
+
+        u(".audio-slider").on("touchend mouseup", () => {
+            isDragging = false;
+        });
 
     </script>
 

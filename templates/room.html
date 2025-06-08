@@ -15,6 +15,8 @@
             bottom : 0;
             left:0;
             right : 0;
+
+            z-index : 5;
             
             width : 100%;
             background : var(--dark-2);
@@ -170,7 +172,7 @@
             background: var(--dark-3);
             outline: none;
             -webkit-transition: .2s;
-            transition: opacity .2s;
+            transition:  .2s;
             border-radius: 10em;
             padding : .7em;
 
@@ -213,6 +215,55 @@
             z-index : 5;
         }  
 
+        /* --- audio slider --- */
+
+        .audio-slider {
+            -webkit-appearance: none;
+            width: 100%;
+            height: .2em;
+            background: var(--dark-3);
+            outline: none;
+            -webkit-transition: .2s;
+            transition: .2s;
+            border-radius: 10em;
+            overflow : hidden; 
+
+            transition : .3s;
+
+            margin-top : -1.2em;
+        }
+
+        .audio-slider:hover {
+            height: .3em;
+        }
+
+        .audio-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 1em;
+            height: 1em;
+            background: var(--b-red);
+            cursor: pointer;
+            border-radius: 50em;
+            z-index : 5;
+            position: relative; 
+
+            box-shadow: -100em 0 0 100em var(--b-red), inset 0 0 0 40px var(--b-gray);
+            transition : .3s;
+        }
+
+        .audio-slider::-moz-range-thumb {
+            width: 1em;
+            height: 1em;
+            background: var(--b-red);
+            cursor: pointer;
+            border-radius: 50em;
+            position: relative;
+            z-index : 5;
+            box-shadow: -100em 0 0 100em var(--b-red), inset 0 0 0 40px var(--b-gray);
+            transition : .3s;
+        }  
+
 
     </style> 
 
@@ -221,6 +272,7 @@
         <div class="floor-top"> 
             <p class="footer-current-play-title">No song loaded</p>
         </div>
+        <input type="range" class="audio-slider" min="0" value="0" max="1000">
         <div class="floor-bottom">
             <input type="range" class="volume-slider" max="100" min="0" value="100">
             <button class="play_pause_btn"> <div class="inner_svg play_svg"></div> </button>

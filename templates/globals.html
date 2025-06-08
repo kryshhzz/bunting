@@ -15,6 +15,8 @@
             ActiveAudio.Loaded = loaded;
             ActiveAudio.Playing = playing;
             showInFooter(audio.title);
+            setSliderMax(audio.buffer.duration);
+            setSliderCurrent(timestamp);
         } 
 
         function setActiveAudioLoaded(yes=true){
@@ -28,15 +30,20 @@
         function setActiveAudioPlaying(yes=true){
             ActiveAudio.Playing = yes; 
             if ( yes ) {
-                u('.inner_svg').removeClass('play_svg');
+                u('.inner_svg').removeClass('play_svg'); 
+                audioSliderStart();
             }else{
                 u('.inner_svg').addClass('play_svg');
+                audioSliderStop();
             }
         }
 
         function isActiveAudioPlaying(){
             return ActiveAudio.Playing;
-        }
+        } 
+
+
+
 
 
     </script>

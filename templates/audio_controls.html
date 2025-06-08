@@ -57,6 +57,10 @@
 
                 } else if ( data.type == "VOLUME" ){
                     setBuntingVolume(data.volume);
+
+                } else if ( data.type == "TIMESTAMP" ){
+                    ActiveAudio.TimeStamp = data.timestamp;
+                    setSliderCurrent(data.timestamp);
                 }
             });
 
@@ -107,16 +111,32 @@
             }
 
             if (isActiveAudioPlaying()) {
+                toggleGlobalPause();
+            } else { 
+                toggleGlobalPlay();
+            } 
+        }
+
+        function toggleGlobalPause() {
+            if (isActiveAudioPlaying()) {
                 sendMessage({
                     type:'PAUSE',
                     uid : ActiveAudio.Audio.uid,
                 });
-            } else { 
-                sendMessage({
-                    type:'PLAY',
-                    uid : ActiveAudio.Audio.uid,
-                    timestamp : getPlayedTill(),
-                });
+            }
+        }
+
+        function toggleGlobalPlay(){
+            if (isActiveAudioLoaded()) {
+                if ( !isActiveAudioPlaying() ){
+                    sendMessage({
+                        type:'PLAY',
+                        uid : ActiveAudio.Audio.uid,
+                        timestamp : getPlayedTill(),
+                    });
+                }
+            }else {
+                alert('let the audio load')
             }
         }
 
