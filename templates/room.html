@@ -85,16 +85,17 @@
             width : 100%; 
 
             display : grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            /* grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); */
+            grid-template-columns: 1fr;
             place-items : center start;
-            grid-gap : 1.5em;
+            grid-gap : 1.2em;
         }
         .library-cont .tr {
             width : 100%; 
 
             display : grid;
-            grid-template-columns: 4em 1fr;
-            place-items : end start;
+            grid-template-columns: 3em 1fr;
+            place-items : center start;
             grid-gap : .5em; 
 
             cursor : pointer;
@@ -103,7 +104,6 @@
         } 
         .library-cont .tr img {
             width : 100%;
-            height : 100%;
             border-radius: .5em;
             object-fit: cover;
 
@@ -112,22 +112,20 @@
         }
 
         .library-song-title{
-            font-size : .8em;
-            padding : .5em 1em;
-            color : var(--wt-60);
+            font-size: .8em;
+            padding: 1em;
+            color: var(--wt-60);
             border-radius: .5em;
-            background : var(--dark-2);
-
-            width : 100%;
-            height : 100%;
-            overflow : hidden;
-            text-overflow : ellipsis;
-            white-space : nowrap;
+            width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
             text-align: left;
+            text-transform: uppercase;
+            transition: .25s;
+            font-weight: 500;
+            letter-spacing: .06em;
 
-            padding-top : 3em;
-
-            transition : .5s;
         } 
         .loading-tr .library-song-title, .loaded-tr .library-song-title {
             position : relative;
@@ -135,27 +133,29 @@
         .loading-tr .library-song-title::after{
             content : "Loading...";
             position : absolute;
-            top :0;
-            left : 0;
-            color : red;
-            padding : .5em 1em;
+            top :50%;
+            right : 0;
+            color : var(--b-red);
+            background : var(--black);
+            padding-left : .5em;
+            transform : translate(-25%,-50%);
         }
 
         .loaded-tr .library-song-title::after {
             content: "";
             position: absolute;
-            top: 0;
-            right: 0;
+            top :50%;
+            right : 0;
+            transform : translate(-50%,-50%);
             background: green;
             width: 1em;
             aspect-ratio: 1 / 1;
-            clip-path: circle(12% at 50% 50%);
-            padding: .75em .7em;
+            clip-path: circle(30% at 50% 50%);
         }
 
 
         .library-song-title:hover {
-            background : var(--dark-3);
+            background : var(--dark-2);
         }
         .library-song-url, .library-song-uid {
             display : none;
