@@ -34,7 +34,9 @@
         }else{
             let buffer = null;
             let new_song = new BuntingSong(audio_name, audio_url, buffer, audio_img, audio_uid);
-            if ( data.preset == "false" || data.preset == false ) showSong(new_song); 
+            if ( data.preset == "false" || data.preset == false ) {
+                if (document.querySelectorAll('.aud_id_'+audio_uid).length == 0) showSong(new_song); 
+            }
             u(".aud_id_"+audio_uid).addClass("loading-tr")
 
             loadSongHelper(audio_url).then(buffer => { 

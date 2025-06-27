@@ -44,7 +44,8 @@
             width : 100%;
             border-radius : 1em;
             margin : 1em auto;
-            padding : 0 1.5em;
+            padding : 1.5em;
+            background : var(--dark-2);
 
             display : flex;
             flex-direction: column;
@@ -75,17 +76,17 @@
         }
 
     </style>
-    <form class="audio_form stiff"> 
+    <!-- <form class="audio_form stiff"> 
         <input type="text" class='audio_title' required value="default" hidden>
         <input type="text" class="audio_url" required value="" placeholder="Enter Youtube Video Link">
         <button>></button>
-    </form>  
+    </form>   -->
 
     <form class="audio_form_spotify stiff"> 
         <input type="text" class='audio_title_spotify' required value="" placeholder="Search Song Name">
         <button>></button>
     </form>
-    <div class="spotify_results stiff">
+    <div class="spotify_results hide stiff">
         <!-- <div class="spotify_result" url="sfdb">
             <img src="https://i.scdn.co/image/ab67616d0000b2737b9888dc365b8f957c63df14" alt="">
             <p>title</p>
@@ -94,33 +95,33 @@
 
 
     <script>
-        u('.audio_form').on('submit', function(e){
-            e.preventDefault(); 
+        // u('.audio_form').on('submit', function(e){
+        //     e.preventDefault(); 
 
-            let url = document.querySelector('.audio_url').value.trim();
-            let title  = document.querySelector('.audio_title').value.trim();
+        //     let url = document.querySelector('.audio_url').value.trim();
+        //     let title  = document.querySelector('.audio_title').value.trim();
 
-            if (!url) return 
+        //     if (!url) return 
 
-            // check if url is of youtube music
-            let url_domain = url.split('/')[2];
-            if ( url_domain.includes("www.youtube.com") || url_domain.includes("music.youtube.com") || url_domain.includes("m.youtube.com") || url_domain.includes("youtu.be") ){ 
-                if ( url_domain.includes("youtu.be") ){
-                    handleYoutubeMusic(url.split("/")[3].split('?')[0]);
-                } else {
-                    handleYoutubeMusic(url.split('=')[1])
-                }
-            }else if (url_domain.includes("open.spotify.com")) {
-                if ( url.includes('album') ) {
-                    alert('albums are not supported, only tracks')
-                }else{
-                    handleSpotifyMusic(url);
-                }
-            }else{
-                LOADSONGGLOBAL(title, url);
-            }
+        //     // check if url is of youtube music
+        //     let url_domain = url.split('/')[2];
+        //     if ( url_domain.includes("www.youtube.com") || url_domain.includes("music.youtube.com") || url_domain.includes("m.youtube.com") || url_domain.includes("youtu.be") ){ 
+        //         if ( url_domain.includes("youtu.be") ){
+        //             handleYoutubeMusic(url.split("/")[3].split('?')[0]);
+        //         } else {
+        //             handleYoutubeMusic(url.split('=')[1])
+        //         }
+        //     }else if (url_domain.includes("open.spotify.com")) {
+        //         if ( url.includes('album') ) {
+        //             alert('albums are not supported, only tracks')
+        //         }else{
+        //             handleSpotifyMusic(url);
+        //         }
+        //     }else{
+        //         LOADSONGGLOBAL(title, url);
+        //     }
 
-        })  
+        // })  
 
 
         u('.audio_form_spotify').on('submit', function(e){
@@ -142,9 +143,13 @@
                                     .then(jsonData => {  
 
                                         let items = jsonData.tracks.items;
-                                        console.log(items) 
+                                        if (typeof items === "undefined") {
+                                            alert("error finding song") 
+                                            return
+                                        }
 
                                         u('.spotify_results').html("")
+                                        u('.spotify_results').removeClass('hide')
 
                                         for ( let item of items ){ 
 
@@ -155,11 +160,13 @@
                                             let s_img = item.album.images[item.album.images.length-1].url;
 
                                             u('.spotify_results').append(`
-                                                <div class="spotify_result" url='${s_url}' onclick='handleSpotifyMusic(this.getAttribute("url"))' >
+                                                <div class="spotify_result" url='${s_url}'  data-id="${item.id}" data-title='${s_name}' data-img="${s_img}"  data-url="${s_url}"
+                                                   onclick='handleSpotifyClick(this)' >
                                                     <img src="${s_img}" alt="">
                                                     <p>${s_name}</p>
                                                 </div>
                                             `)
+
                                         }
 
                                     })
@@ -181,28 +188,42 @@
         })
 
 
-        function handleYoutubeMusic(url_id) {
+        // function handleYoutubeMusic(url_id) {
 
-            let first_url = `/ytextract/`+url_id;
+        //     let first_url = `/ytextract/`+url_id;
 
-            let first_response ;
+        //     let first_response ;
 
-            fetch(first_url)
-                .then(response => response.json()) // Parse JSON body
-                .then(jsonData => { 
-                    first_response = jsonData;
-                    console.log('first reps ', first_response) 
+        //     fetch(first_url)
+        //         .then(response => response.json()) // Parse JSON body
+        //         .then(jsonData => { 
+        //             first_response = jsonData;
+        //             console.log('first reps ', first_response) 
 
-                    LOADSONGGLOBAL(first_response.title, first_response.link, "https://img.youtube.com/vi/"+url_id+"/mqdefault.jpg", url_id);
-                })
-                .catch(error => {
-                    console.error('Fetch error:', error);
-                });
+        //             LOADSONGGLOBAL(first_response.title, first_response.link, "https://img.youtube.com/vi/"+url_id+"/mqdefault.jpg", url_id);
+        //         })
+        //         .catch(error => {
+        //             console.error('Fetch error:', error);
+        //         });
 
+        // }
+
+        function handleSpotifyClick(el){
+            u('.spotify_results').html("")
+            u('.spotify_results').addClass('hide')
+
+            const new_song = new BuntingSong(
+                el.dataset.title,
+                el.dataset.url,
+                null,
+                el.dataset.img,
+                el.dataset.id
+            );
+            showSong(new_song);
+            u(".aud_id_"+el.dataset.id).addClass("loading-tr")
+            handleSpotifyMusic(el.dataset.url, el.dataset.id)
         }
-
-        
-        function handleSpotifyMusic(url){
+        function handleSpotifyMusic(url, uid){
 
             let sj_data = {
                 type :"song",
@@ -218,8 +239,9 @@
             })
             .then(response => response.json())
             .then(first_response => { 
-                first_response = first_response.data;
-                LOADSONGGLOBAL(first_response.title, first_response.downloadLink, first_response.cover, first_response.id);
+                first_response = first_response.data; 
+
+                LOADSONGGLOBAL(first_response.title, first_response.downloadLink, first_response.cover, uid);
             })
             .catch(error => {
                 console.error('Error:', error);
